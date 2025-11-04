@@ -6,11 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import { ru } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const BookingForm = () => {
   const [checkIn, setCheckIn] = useState<Date>();
@@ -19,8 +21,16 @@ const BookingForm = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [showPayment, setShowPayment] = useState(false);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [bookingId, setBookingId] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const roomPrices = {
+    standard: 80,
+    deluxe: 120,
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!checkIn || !checkOut || !roomType || !name || !phone || !email) {
@@ -28,17 +38,63 @@ const BookingForm = () => {
       return;
     }
 
-    // For now, just show success message
-    // Payment integration will be added after enabling Cloud
-    toast.success("Спасибо за бронирование! Мы свяжемся с вами в ближайшее время.");
-    
-    // Reset form
-    setCheckIn(undefined);
-    setCheckOut(undefined);
-    setRoomType("");
-    setName("");
-    setPhone("");
-    setEmail("");
+    // Calculate nights and total price
+    const nights = differenceInDays(checkOut, checkIn);
+    const pricePerNight = roomPrices[roomType as keyof typeof roomPrices];
+    const total = nights * pricePerNight;
+    setTotalPrice(total);
+
+    // Save booking to database
+    try {
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert({
+          name,
+          phone,
+          email,
+          room_type: roomType,
+          check_in: format(checkIn, 'yyyy-MM-dd'),
+          check_out: format(checkOut, 'yyyy-MM-dd'),
+          total_price: total,
+          payment_status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setBookingId(data.id);
+      setShowPayment(true);
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      toast.error("Ошибка при создании бронирования");
+    }
+  };
+
+  const handlePayment = async () => {
+    // Mock payment - in real implementation this would integrate with YooKassa
+    try {
+      const { error } = await supabase
+        .from('bookings')
+        .update({ payment_status: 'completed' })
+        .eq('id', bookingId);
+
+      if (error) throw error;
+
+      toast.success("Оплата успешно завершена! Мы отправим подтверждение на ваш email.");
+      setShowPayment(false);
+      
+      // Reset form
+      setCheckIn(undefined);
+      setCheckOut(undefined);
+      setRoomType("");
+      setName("");
+      setPhone("");
+      setEmail("");
+    } catch (error) {
+      console.error('Error updating payment:', error);
+      toast.error("Ошибка при обработке оплаты");
+    }
   };
 
   return (
@@ -171,11 +227,44 @@ const BookingForm = () => {
                 type="submit" 
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg transition-all duration-300 hover:scale-105"
               >
-                Отправить заявку
+                Забронировать и оплатить
               </Button>
             </form>
           </CardContent>
         </Card>
+
+        <Dialog open={showPayment} onOpenChange={setShowPayment}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Оплата бронирования</DialogTitle>
+              <DialogDescription>
+                Подтвердите оплату для завершения бронирования
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Имя: {name}</p>
+                <p className="text-sm text-muted-foreground">Email: {email}</p>
+                <p className="text-sm text-muted-foreground">Телефон: {phone}</p>
+                <p className="text-sm text-muted-foreground">
+                  Даты: {checkIn && format(checkIn, "dd.MM.yyyy")} - {checkOut && format(checkOut, "dd.MM.yyyy")}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Тип номера: {roomType === 'standard' ? 'Стандарт' : 'Делюкс'}
+                </p>
+              </div>
+              <div className="border-t pt-4">
+                <p className="text-2xl font-bold text-foreground">Итого: {totalPrice} BYN</p>
+              </div>
+              <Button 
+                onClick={handlePayment}
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg"
+              >
+                Оплатить (Фиктивная оплата)
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </section>
   );

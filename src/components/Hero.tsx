@@ -33,9 +33,9 @@ const Hero = () => {
           </Button>
           <Button 
             size="lg" 
-            variant="outline"
+            variant="secondary"
             onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
-            className="border-2 border-white text-white hover:bg-white hover:text-foreground px-8 py-6 text-lg transition-all duration-300 hover:scale-105"
+            className="text-foreground px-8 py-6 text-lg transition-all duration-300 hover:scale-105"
           >
             Узнать больше
           </Button>

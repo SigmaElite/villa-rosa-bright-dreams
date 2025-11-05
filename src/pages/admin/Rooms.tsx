@@ -24,7 +24,7 @@ interface Room {
   title: string;
   description: string;
   price: number;
-  image_url: string;
+  images: string[];
   amenities: string[];
   is_active: boolean;
   display_order: number;
@@ -40,7 +40,7 @@ const RoomsPage = () => {
     price: 0,
     amenities: "",
     is_active: true,
-    image_url: "",
+    images: [] as string[],
   });
   const [uploading, setUploading] = useState(false);
 
@@ -62,30 +62,42 @@ const RoomsPage = () => {
     setRooms(data || []);
   };
 
-  const handleImageUpload = async (file: File) => {
+  const handleImageUpload = async (files: FileList) => {
     setUploading(true);
     try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const uploadedUrls: string[] = [];
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from("room-images")
-        .upload(filePath, file);
+        const { error: uploadError } = await supabase.storage
+          .from("room-images")
+          .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+        if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from("room-images")
-        .getPublicUrl(filePath);
+        const { data: { publicUrl } } = supabase.storage
+          .from("room-images")
+          .getPublicUrl(filePath);
 
-      setFormData({ ...formData, image_url: publicUrl });
-      toast.success("Изображение загружено");
+        uploadedUrls.push(publicUrl);
+      }
+
+      setFormData({ ...formData, images: [...formData.images, ...uploadedUrls] });
+      toast.success(`Загружено ${uploadedUrls.length} изображений`);
     } catch (error) {
       toast.error("Ошибка загрузки изображения");
     } finally {
       setUploading(false);
     }
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = formData.images.filter((_, i) => i !== index);
+    setFormData({ ...formData, images: newImages });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -118,7 +130,7 @@ const RoomsPage = () => {
             price: formData.price,
             amenities: amenitiesArray,
             is_active: formData.is_active,
-            image_url: formData.image_url || editingRoom.image_url,
+            images: formData.images.length > 0 ? formData.images : editingRoom.images,
           })
           .eq("id", editingRoom.id);
 
@@ -131,7 +143,7 @@ const RoomsPage = () => {
           price: formData.price,
           amenities: amenitiesArray,
           is_active: formData.is_active,
-          image_url: formData.image_url || "/placeholder.svg",
+          images: formData.images.length > 0 ? formData.images : ["/placeholder.svg"],
           display_order: rooms.length + 1,
         });
 
@@ -147,7 +159,7 @@ const RoomsPage = () => {
         price: 0,
         amenities: "",
         is_active: true,
-        image_url: "",
+        images: [],
       });
       fetchRooms();
     } catch (error) {
@@ -163,7 +175,7 @@ const RoomsPage = () => {
       price: room.price,
       amenities: room.amenities.join(", "),
       is_active: room.is_active,
-      image_url: room.image_url,
+      images: room.images,
     });
     setIsDialogOpen(true);
   };
@@ -200,7 +212,7 @@ const RoomsPage = () => {
                   price: 0,
                   amenities: "",
                   is_active: true,
-                  image_url: "",
+                  images: [],
                 });
               }}>
                 <Plus className="h-4 w-4 mr-2" />
@@ -261,22 +273,36 @@ const RoomsPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="image">Изображение</Label>
+                  <Label htmlFor="image">Изображения</Label>
                   <div className="flex items-center gap-4">
                     <Input
                       id="image"
                       type="file"
                       accept="image/*"
+                      multiple
                       onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleImageUpload(file);
+                        const files = e.target.files;
+                        if (files && files.length > 0) handleImageUpload(files);
                       }}
                       disabled={uploading}
                     />
                     {uploading && <span className="text-sm">Загрузка...</span>}
                   </div>
-                  {formData.image_url && (
-                    <img src={formData.image_url} alt="Preview" className="mt-2 h-32 w-32 object-cover rounded" />
+                  {formData.images.length > 0 && (
+                    <div className="grid grid-cols-4 gap-2 mt-2">
+                      {formData.images.map((img, i) => (
+                        <div key={i} className="relative group">
+                          <img src={img} alt={`Preview ${i + 1}`} className="h-24 w-full object-cover rounded" />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(i)}
+                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
                 <div className="flex items-center space-x-2">
@@ -304,7 +330,14 @@ const RoomsPage = () => {
           {rooms.map((room) => (
             <Card key={room.id}>
               <CardHeader>
-                <img src={room.image_url} alt={room.title} className="w-full h-48 object-cover rounded-md mb-4" />
+                <div className="relative mb-4">
+                  <img src={room.images[0] || "/placeholder.svg"} alt={room.title} className="w-full h-48 object-cover rounded-md" />
+                  {room.images.length > 1 && (
+                    <div className="absolute bottom-2 right-2 bg-background/90 px-2 py-1 rounded text-xs">
+                      +{room.images.length - 1} фото
+                    </div>
+                  )}
+                </div>
                 <CardTitle>{room.title}</CardTitle>
                 <CardDescription>{room.price} BYN / ночь</CardDescription>
               </CardHeader>

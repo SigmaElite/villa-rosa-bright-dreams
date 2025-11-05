@@ -63,7 +63,7 @@ export type Database = {
           description: string
           display_order: number
           id: string
-          image_url: string
+          images: string[]
           is_active: boolean | null
           price: number
           title: string
@@ -75,7 +75,7 @@ export type Database = {
           description: string
           display_order?: number
           id?: string
-          image_url: string
+          images?: string[]
           is_active?: boolean | null
           price: number
           title: string
@@ -87,7 +87,7 @@ export type Database = {
           description?: string
           display_order?: number
           id?: string
-          image_url?: string
+          images?: string[]
           is_active?: boolean | null
           price?: number
           title?: string

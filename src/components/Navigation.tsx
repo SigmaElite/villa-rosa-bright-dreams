@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Lock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -66,6 +67,15 @@ const Navigation = () => {
             >
               Забронировать
             </Button>
+            <Link to="/auth">
+              <Button
+                variant="outline"
+                size="icon"
+                className={isScrolled ? "" : "border-white text-white hover:bg-white/20"}
+              >
+                <Lock className="h-4 w-4" />
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -98,6 +108,15 @@ const Navigation = () => {
               >
                 Забронировать
               </Button>
+              <Link to="/auth" className="w-full">
+                <Button
+                  variant="outline"
+                  className={`w-full ${isScrolled ? "" : "border-white text-white hover:bg-white/20"}`}
+                >
+                  <Lock className="h-4 w-4 mr-2" />
+                  Вход для администратора
+                </Button>
+              </Link>
             </div>
           </div>
         )}

@@ -13,8 +13,34 @@ import { ru } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+import { useNavigate } from "react-router-dom";
+
+// Validation schema
+const bookingSchema = z.object({
+  name: z.string()
+    .trim()
+    .min(2, "Имя должно содержать минимум 2 символа")
+    .max(100, "Имя слишком длинное")
+    .regex(/^[а-яА-ЯёЁa-zA-Z\s-]+$/, "Имя содержит недопустимые символы"),
+  
+  phone: z.string()
+    .trim()
+    .regex(/^\+375\s?\(?\d{2}\)?\s?\d{3}-?\d{2}-?\d{2}$/, "Формат: +375 (XX) XXX-XX-XX")
+    .max(20, "Телефон слишком длинный"),
+  
+  email: z.string()
+    .trim()
+    .email("Неверный формат email")
+    .max(255, "Email слишком длинный"),
+  
+  roomType: z.enum(['standard', 'deluxe'], {
+    errorMap: () => ({ message: "Выберите корректный тип номера" })
+  }),
+});
 
 const BookingForm = () => {
+  const navigate = useNavigate();
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
   const [roomType, setRoomType] = useState("");
@@ -24,6 +50,7 @@ const BookingForm = () => {
   const [showPayment, setShowPayment] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
   const [bookingId, setBookingId] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const roomPrices = {
     standard: 80,
@@ -32,9 +59,52 @@ const BookingForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
     
-    if (!checkIn || !checkOut || !roomType || !name || !phone || !email) {
-      toast.error("Пожалуйста, заполните все поля");
+    // Check if user is authenticated
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error("Необходимо войти в систему для бронирования");
+      navigate("/auth");
+      return;
+    }
+
+    // Validate dates
+    if (!checkIn || !checkOut) {
+      toast.error("Пожалуйста, выберите даты заезда и выезда");
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (checkIn < today) {
+      toast.error("Дата заезда не может быть в прошлом");
+      return;
+    }
+
+    if (checkOut <= checkIn) {
+      toast.error("Дата выезда должна быть позже даты заезда");
+      return;
+    }
+
+    // Validate form data with zod
+    const result = bookingSchema.safeParse({
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim(),
+      roomType: roomType as 'standard' | 'deluxe',
+    });
+
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as string] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      toast.error("Пожалуйста, проверьте введенные данные");
       return;
     }
 
@@ -49,14 +119,15 @@ const BookingForm = () => {
       const { data, error } = await supabase
         .from('bookings')
         .insert({
-          name,
-          phone,
-          email,
+          name: result.data.name,
+          phone: result.data.phone,
+          email: result.data.email,
           room_type: roomType,
           check_in: format(checkIn, 'yyyy-MM-dd'),
           check_out: format(checkOut, 'yyyy-MM-dd'),
           total_price: total,
-          payment_status: 'pending'
+          payment_status: 'pending',
+          user_id: session.user.id,
         })
         .select()
         .single();
@@ -123,10 +194,19 @@ const BookingForm = () => {
                   <Input
                     id="name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      if (errors.name) {
+                        const newErrors = { ...errors };
+                        delete newErrors.name;
+                        setErrors(newErrors);
+                      }
+                    }}
                     placeholder="Иван Иванов"
                     required
+                    className={errors.name ? "border-destructive" : ""}
                   />
+                  {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -135,10 +215,19 @@ const BookingForm = () => {
                     id="phone"
                     type="tel"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+375 (__) ___-__-__"
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      if (errors.phone) {
+                        const newErrors = { ...errors };
+                        delete newErrors.phone;
+                        setErrors(newErrors);
+                      }
+                    }}
+                    placeholder="+375 (29) 123-45-67"
                     required
+                    className={errors.phone ? "border-destructive" : ""}
                   />
+                  {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
                 </div>
               </div>
 
@@ -148,16 +237,36 @@ const BookingForm = () => {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errors.email) {
+                      const newErrors = { ...errors };
+                      delete newErrors.email;
+                      setErrors(newErrors);
+                    }
+                  }}
                   placeholder="example@mail.com"
                   required
+                  className={errors.email ? "border-destructive" : ""}
                 />
+                {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
               </div>
 
               <div className="space-y-2">
                 <Label>Тип номера *</Label>
-                <Select value={roomType} onValueChange={setRoomType} required>
-                  <SelectTrigger>
+                <Select 
+                  value={roomType} 
+                  onValueChange={(value) => {
+                    setRoomType(value);
+                    if (errors.roomType) {
+                      const newErrors = { ...errors };
+                      delete newErrors.roomType;
+                      setErrors(newErrors);
+                    }
+                  }} 
+                  required
+                >
+                  <SelectTrigger className={errors.roomType ? "border-destructive" : ""}>
                     <SelectValue placeholder="Выберите тип номера" />
                   </SelectTrigger>
                   <SelectContent>
@@ -165,6 +274,7 @@ const BookingForm = () => {
                     <SelectItem value="deluxe">Делюкс (120 BYN/сутки)</SelectItem>
                   </SelectContent>
                 </Select>
+                {errors.roomType && <p className="text-sm text-destructive">{errors.roomType}</p>}
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Wifi, Tv, Coffee, Wind, ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -80,21 +81,37 @@ const Rooms = () => {
             {rooms.map((room, index) => (
               <Card 
                 key={room.id} 
-                className="overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 animate-fade-in-up border-border cursor-pointer"
+                className="overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 animate-fade-in-up border-border"
                 style={{ animationDelay: `${index * 0.2}s` }}
-                onClick={() => setSelectedRoom(room)}
               >
                 <div className="relative h-64 overflow-hidden">
-                  <img 
-                    src={room.images[0] || "/placeholder.svg"} 
-                    alt={room.title}
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                  />
-                  <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold">
+                  <Carousel className="w-full h-full">
+                    <CarouselContent>
+                      {room.images.map((image, imgIndex) => (
+                        <CarouselItem key={imgIndex}>
+                          <img 
+                            src={image || "/placeholder.svg"} 
+                            alt={`${room.title} - фото ${imgIndex + 1}`}
+                            className="w-full h-64 object-cover cursor-pointer"
+                            onClick={() => setSelectedRoom(room)}
+                          />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious 
+                      className="left-2" 
+                      onClick={(e) => e.stopPropagation()} 
+                    />
+                    <CarouselNext 
+                      className="right-2" 
+                      onClick={(e) => e.stopPropagation()} 
+                    />
+                  </Carousel>
+                  <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold pointer-events-none z-10">
                     от {room.price} BYN/сутки
                   </div>
                   {room.images.length > 1 && (
-                    <div className="absolute bottom-4 right-4 bg-background/90 text-foreground px-3 py-1 rounded-full text-sm flex items-center gap-1">
+                    <div className="absolute bottom-4 left-4 bg-background/90 text-foreground px-3 py-1 rounded-full text-sm flex items-center gap-1 pointer-events-none z-10">
                       <ImageIcon className="w-4 h-4" />
                       {room.images.length}
                     </div>

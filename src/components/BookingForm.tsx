@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,10 +34,14 @@ const bookingSchema = z.object({
     .email("Неверный формат email")
     .max(255, "Email слишком длинный"),
   
-  roomType: z.enum(['standard', 'deluxe'], {
-    errorMap: () => ({ message: "Выберите корректный тип номера" })
-  }),
+  roomType: z.string().min(1, "Выберите тип номера"),
 });
+
+type Room = {
+  id: string;
+  title: string;
+  price: number;
+};
 
 const BookingForm = () => {
   const navigate = useNavigate();
@@ -51,11 +55,30 @@ const BookingForm = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [bookingId, setBookingId] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const roomPrices = {
-    standard: 80,
-    deluxe: 120,
-  };
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('rooms')
+          .select('id, title, price')
+          .eq('is_active', true)
+          .order('display_order', { ascending: true });
+
+        if (error) throw error;
+        setRooms(data || []);
+      } catch (error) {
+        console.error('Error fetching rooms:', error);
+        toast.error("Ошибка загрузки номеров");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRooms();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +116,7 @@ const BookingForm = () => {
       name: name.trim(),
       phone: phone.trim(),
       email: email.trim(),
-      roomType: roomType as 'standard' | 'deluxe',
+      roomType: roomType,
     });
 
     if (!result.success) {
@@ -110,8 +133,12 @@ const BookingForm = () => {
 
     // Calculate nights and total price
     const nights = differenceInDays(checkOut, checkIn);
-    const pricePerNight = roomPrices[roomType as keyof typeof roomPrices];
-    const total = nights * pricePerNight;
+    const selectedRoom = rooms.find(r => r.id === roomType);
+    if (!selectedRoom) {
+      toast.error("Выбранный номер не найден");
+      return;
+    }
+    const total = nights * selectedRoom.price;
     setTotalPrice(total);
 
     // Save booking to database
@@ -265,13 +292,17 @@ const BookingForm = () => {
                     }
                   }} 
                   required
+                  disabled={loading}
                 >
                   <SelectTrigger className={errors.roomType ? "border-destructive" : ""}>
-                    <SelectValue placeholder="Выберите тип номера" />
+                    <SelectValue placeholder={loading ? "Загрузка..." : "Выберите тип номера"} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="standard">Стандарт (80 BYN/сутки)</SelectItem>
-                    <SelectItem value="deluxe">Делюкс (120 BYN/сутки)</SelectItem>
+                    {rooms.map((room) => (
+                      <SelectItem key={room.id} value={room.id}>
+                        {room.title} ({room.price} BYN/сутки)
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 {errors.roomType && <p className="text-sm text-destructive">{errors.roomType}</p>}
@@ -361,7 +392,7 @@ const BookingForm = () => {
                   Даты: {checkIn && format(checkIn, "dd.MM.yyyy")} - {checkOut && format(checkOut, "dd.MM.yyyy")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Тип номера: {roomType === 'standard' ? 'Стандарт' : 'Делюкс'}
+                  Тип номера: {rooms.find(r => r.id === roomType)?.title}
                 </p>
               </div>
               <div className="border-t pt-4">

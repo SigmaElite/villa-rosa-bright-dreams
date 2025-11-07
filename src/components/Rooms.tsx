@@ -21,6 +21,7 @@ const Rooms = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [loading, setLoading] = useState(true);
+  const [carouselApis, setCarouselApis] = useState<Map<string, any>>(new Map());
 
   useEffect(() => {
     fetchRooms();
@@ -85,15 +86,41 @@ const Rooms = () => {
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
                 <div className="relative h-64 overflow-hidden group/carousel">
-                  <Carousel className="w-full h-full" opts={{ loop: true }}>
+                  <Carousel 
+                    className="w-full h-full" 
+                    opts={{ loop: true }}
+                    setApi={(api) => {
+                      if (api) {
+                        setCarouselApis(prev => new Map(prev).set(room.id, api));
+                      }
+                    }}
+                  >
                     <CarouselContent className="h-64">
                       {room.images.map((image, imgIndex) => (
-                        <CarouselItem key={imgIndex} className="h-64">
+                        <CarouselItem key={imgIndex} className="h-64 relative">
+                          <div 
+                            className="absolute inset-0 z-10 flex"
+                            onDoubleClick={() => setSelectedRoom(room)}
+                          >
+                            <div 
+                              className="w-1/2 h-full cursor-w-resize"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                carouselApis.get(room.id)?.scrollPrev();
+                              }}
+                            />
+                            <div 
+                              className="w-1/2 h-full cursor-e-resize"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                carouselApis.get(room.id)?.scrollNext();
+                              }}
+                            />
+                          </div>
                           <img 
                             src={image || "/placeholder.svg"} 
                             alt={`${room.title} - фото ${imgIndex + 1}`}
-                            className="w-full h-64 object-cover cursor-pointer"
-                            onClick={() => setSelectedRoom(room)}
+                            className="w-full h-64 object-cover pointer-events-none"
                           />
                         </CarouselItem>
                       ))}
@@ -102,20 +129,18 @@ const Rooms = () => {
                       <>
                         <CarouselPrevious 
                           className="left-2 z-20 opacity-0 group-hover/carousel:opacity-100 transition-opacity" 
-                          onClick={(e) => e.stopPropagation()} 
                         />
                         <CarouselNext 
                           className="right-2 z-20 opacity-0 group-hover/carousel:opacity-100 transition-opacity" 
-                          onClick={(e) => e.stopPropagation()} 
                         />
                       </>
                     )}
                   </Carousel>
-                  <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold pointer-events-none z-10">
+                  <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold pointer-events-none z-30">
                     от {room.price} BYN/сутки
                   </div>
                   {room.images.length > 1 && (
-                    <div className="absolute bottom-4 left-4 bg-background/90 text-foreground px-3 py-1 rounded-full text-sm flex items-center gap-1 pointer-events-none z-10">
+                    <div className="absolute bottom-4 left-4 bg-background/90 text-foreground px-3 py-1 rounded-full text-sm flex items-center gap-1 pointer-events-none z-30">
                       <ImageIcon className="w-4 h-4" />
                       {room.images.length}
                     </div>

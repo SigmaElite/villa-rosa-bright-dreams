@@ -84,11 +84,11 @@ const Rooms = () => {
                 className="overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 animate-fade-in-up border-border"
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
-                <div className="relative h-64 overflow-hidden">
-                  <Carousel className="w-full h-full">
-                    <CarouselContent>
+                <div className="relative h-64 overflow-hidden group/carousel">
+                  <Carousel className="w-full h-full" opts={{ loop: true }}>
+                    <CarouselContent className="h-64">
                       {room.images.map((image, imgIndex) => (
-                        <CarouselItem key={imgIndex}>
+                        <CarouselItem key={imgIndex} className="h-64">
                           <img 
                             src={image || "/placeholder.svg"} 
                             alt={`${room.title} - фото ${imgIndex + 1}`}
@@ -98,14 +98,18 @@ const Rooms = () => {
                         </CarouselItem>
                       ))}
                     </CarouselContent>
-                    <CarouselPrevious 
-                      className="left-2" 
-                      onClick={(e) => e.stopPropagation()} 
-                    />
-                    <CarouselNext 
-                      className="right-2" 
-                      onClick={(e) => e.stopPropagation()} 
-                    />
+                    {room.images.length > 1 && (
+                      <>
+                        <CarouselPrevious 
+                          className="left-2 z-20 opacity-0 group-hover/carousel:opacity-100 transition-opacity" 
+                          onClick={(e) => e.stopPropagation()} 
+                        />
+                        <CarouselNext 
+                          className="right-2 z-20 opacity-0 group-hover/carousel:opacity-100 transition-opacity" 
+                          onClick={(e) => e.stopPropagation()} 
+                        />
+                      </>
+                    )}
                   </Carousel>
                   <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold pointer-events-none z-10">
                     от {room.price} BYN/сутки

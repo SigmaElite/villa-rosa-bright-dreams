@@ -16,9 +16,9 @@ const Contact = () => {
 
         <div className="grid md:grid-cols-2 gap-12">
           <div className="space-y-8 animate-slide-in-left">
-            <div className="flex gap-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                <MapPin className="w-6 h-6 text-primary" />
+            <div className="flex gap-4 group">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:animate-pulse-slow transition-all">
+                <MapPin className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
               </div>
               <div>
                 <h3 className="font-semibold text-lg mb-2 text-foreground">Адрес</h3>
@@ -26,9 +26,9 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Phone className="w-6 h-6 text-primary" />
+            <div className="flex gap-4 group">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:animate-pulse-slow transition-all">
+                <Phone className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
               </div>
               <div>
                 <h3 className="font-semibold text-lg mb-2 text-foreground">Телефон</h3>
@@ -41,9 +41,9 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Clock className="w-6 h-6 text-primary" />
+            <div className="flex gap-4 group">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:animate-pulse-slow transition-all">
+                <Clock className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
               </div>
               <div>
                 <h3 className="font-semibold text-lg mb-2 text-foreground">Время работы</h3>
@@ -51,9 +51,9 @@ const Contact = () => {
               </div>
             </div>
 
-            <div className="flex gap-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Mail className="w-6 h-6 text-primary" />
+            <div className="flex gap-4 group">
+              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:animate-pulse-slow transition-all">
+                <Mail className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
               </div>
               <div>
                 <h3 className="font-semibold text-lg mb-2 text-foreground">Email</h3>

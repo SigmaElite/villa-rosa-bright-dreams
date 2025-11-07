@@ -82,7 +82,7 @@ const Rooms = () => {
             {rooms.map((room, index) => (
               <Card 
                 key={room.id} 
-                className="overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 animate-fade-in-up border-border"
+                className="overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 animate-fade-in-up border-border group"
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
                 <div className="relative h-64 overflow-hidden group/carousel">
@@ -146,8 +146,8 @@ const Rooms = () => {
                     </div>
                   )}
                 </div>
-                <CardHeader>
-                  <CardTitle className="text-2xl font-serif text-card-foreground">{room.title}</CardTitle>
+                <CardHeader className="group-hover:animate-pulse-slow">
+                  <CardTitle className="text-2xl font-serif text-card-foreground transition-colors">{room.title}</CardTitle>
                   <CardDescription className="text-base line-clamp-2">{room.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -155,8 +155,8 @@ const Rooms = () => {
                     {room.amenities.slice(0, 4).map((amenity, i) => {
                       const Icon = amenityIcons[amenity];
                       return (
-                        <div key={i} className="flex items-center gap-2 text-muted-foreground">
-                          {Icon && <Icon className="w-4 h-4" />}
+                        <div key={i} className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group/amenity">
+                          {Icon && <Icon className="w-4 h-4 group-hover/amenity:scale-125 transition-transform" />}
                           <span className="text-sm">{amenity}</span>
                         </div>
                       );

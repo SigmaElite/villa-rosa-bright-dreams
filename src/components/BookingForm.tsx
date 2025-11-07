@@ -188,7 +188,7 @@ const BookingForm = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                 <div className="space-y-2">
                   <Label htmlFor="name">Ваше имя *</Label>
                   <Input
@@ -231,7 +231,7 @@ const BookingForm = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
                 <Label htmlFor="email">Email *</Label>
                 <Input
                   id="email"
@@ -252,7 +252,7 @@ const BookingForm = () => {
                 {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
                 <Label>Тип номера *</Label>
                 <Select 
                   value={roomType} 
@@ -277,7 +277,7 @@ const BookingForm = () => {
                 {errors.roomType && <p className="text-sm text-destructive">{errors.roomType}</p>}
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-6 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
                 <div className="space-y-2">
                   <Label>Дата заезда *</Label>
                   <Popover>
@@ -335,7 +335,8 @@ const BookingForm = () => {
 
               <Button 
                 type="submit" 
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg transition-all duration-300 hover:scale-105"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg transition-all duration-300 hover:scale-105 animate-fade-in-up"
+                style={{ animationDelay: '0.5s' }}
               >
                 Забронировать и оплатить
               </Button>

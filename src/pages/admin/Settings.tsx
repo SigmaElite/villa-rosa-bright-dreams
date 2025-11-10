@@ -44,8 +44,7 @@ const SettingsPage = () => {
   const handleSave = async (key: string, value: string) => {
     const { error } = await supabase
       .from("site_settings")
-      .update({ value })
-      .eq("key", key);
+      .upsert({ key, value }, { onConflict: "key" });
 
     if (error) {
       toast.error("Ошибка сохранения");

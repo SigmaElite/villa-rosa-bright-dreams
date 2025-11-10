@@ -1,17 +1,19 @@
 import { Hotel, Clock, MapPin, Phone } from "lucide-react";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const About = () => {
+  const { settings } = useSiteSettings();
+  
   return (
     <section id="about" className="py-20 px-4 bg-background">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
-            О нашем отеле
+            {settings.about_title || "О нашем отеле"}
           </h2>
           <div className="w-24 h-1 bg-primary mx-auto mb-6" />
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Вилла Роза - это мини-отель, где классический стиль сочетается с современным комфортом. 
-            Мы создали пространство для вашего идеального отдыха в центре Гомеля.
+            {settings.about_description || "Вилла Роза - это мини-отель, где классический стиль сочетается с современным комфортом. Мы создали пространство для вашего идеального отдыха в центре Гомеля."}
           </p>
         </div>
 
@@ -32,7 +34,7 @@ const About = () => {
             </div>
             <h3 className="text-xl font-semibold mb-2 text-card-foreground">Удобное расположение</h3>
             <p className="text-muted-foreground">
-              ул. Ильича, 150, Гомель - в доступной близости от центра
+              {settings.contact_address || "ул. Ильича, 150, Гомель"} - в доступной близости от центра
             </p>
           </div>
 
@@ -52,7 +54,7 @@ const About = () => {
             </div>
             <h3 className="text-xl font-semibold mb-2 text-card-foreground">Всегда на связи</h3>
             <p className="text-muted-foreground">
-              Звоните нам: +375 33 355-97-67
+              Звоните нам: {settings.contact_phone || "+375 33 355-97-67"}
             </p>
           </div>
         </div>

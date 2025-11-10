@@ -1,6 +1,9 @@
 import { MapPin, Phone, Clock, Mail } from "lucide-react";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const Contact = () => {
+  const { settings } = useSiteSettings();
+  
   return (
     <section id="contact" className="py-20 px-4 bg-muted/30">
       <div className="max-w-6xl mx-auto">
@@ -22,7 +25,7 @@ const Contact = () => {
               </div>
               <div>
                 <h3 className="font-semibold text-lg mb-2 text-foreground">Адрес</h3>
-                <p className="text-muted-foreground">ул. Ильича, 150<br />Гомель, Беларусь</p>
+                <p className="text-muted-foreground">{settings.contact_address || "ул. Ильича, 150, Гомель, Беларусь"}</p>
               </div>
             </div>
 
@@ -33,10 +36,10 @@ const Contact = () => {
               <div>
                 <h3 className="font-semibold text-lg mb-2 text-foreground">Телефон</h3>
                 <a 
-                  href="tel:+375333559767" 
+                  href={`tel:${settings.contact_phone?.replace(/\s/g, '') || '+375333559767'}`}
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  +375 33 355-97-67
+                  {settings.contact_phone || "+375 33 355-97-67"}
                 </a>
               </div>
             </div>
@@ -58,10 +61,10 @@ const Contact = () => {
               <div>
                 <h3 className="font-semibold text-lg mb-2 text-foreground">Email</h3>
                 <a 
-                  href="mailto:info@villaroza.by" 
+                  href={`mailto:${settings.contact_email || 'info@villaroza.by'}`}
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  info@villaroza.by
+                  {settings.contact_email || "info@villaroza.by"}
                 </a>
               </div>
             </div>

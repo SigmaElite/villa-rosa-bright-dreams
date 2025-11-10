@@ -189,6 +189,17 @@ const SettingsPage = () => {
                 />
               </div>
               <div className="space-y-2">
+                <Label htmlFor="booking_email">Email для бронирований</Label>
+                <Input
+                  id="booking_email"
+                  type="email"
+                  value={settings.booking_email || ""}
+                  onChange={(e) => updateSetting("booking_email", e.target.value)}
+                  onBlur={(e) => handleSave("booking_email", e.target.value)}
+                  placeholder="bookings@villaroza.by"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="contact_address">Адрес</Label>
                 <Input
                   id="contact_address"

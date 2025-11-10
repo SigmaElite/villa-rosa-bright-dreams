@@ -51,12 +51,10 @@ const BookingForm = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [showPayment, setShowPayment] = useState(false);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [bookingId, setBookingId] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -139,9 +137,9 @@ const BookingForm = () => {
       return;
     }
     const total = nights * selectedRoom.price;
-    setTotalPrice(total);
 
-    // Save booking to database
+    // Save booking to database and send email
+    setIsSubmitting(true);
     try {
       const { data, error } = await supabase
         .from('bookings')
@@ -153,7 +151,7 @@ const BookingForm = () => {
           check_in: format(checkIn, 'yyyy-MM-dd'),
           check_out: format(checkOut, 'yyyy-MM-dd'),
           total_price: total,
-          payment_status: 'pending',
+          payment_status: 'confirmed',
           user_id: session.user.id,
         })
         .select()
@@ -161,26 +159,26 @@ const BookingForm = () => {
 
       if (error) throw error;
       
-      setBookingId(data.id);
-      setShowPayment(true);
-    } catch (error) {
-      console.error('Error creating booking:', error);
-      toast.error("Ошибка при создании бронирования");
-    }
-  };
+      // Send email notification
+      const { error: emailError } = await supabase.functions.invoke('send-booking-email', {
+        body: {
+          bookingId: data.id,
+          name: result.data.name,
+          email: result.data.email,
+          phone: result.data.phone,
+          roomType: selectedRoom.title,
+          checkIn: format(checkIn, 'dd.MM.yyyy'),
+          checkOut: format(checkOut, 'dd.MM.yyyy'),
+          totalPrice: total,
+        }
+      });
 
-  const handlePayment = async () => {
-    // Mock payment - in real implementation this would integrate with YooKassa
-    try {
-      const { error } = await supabase
-        .from('bookings')
-        .update({ payment_status: 'completed' })
-        .eq('id', bookingId);
-
-      if (error) throw error;
-
-      toast.success("Оплата успешно завершена! Мы отправим подтверждение на ваш email.");
-      setShowPayment(false);
+      if (emailError) {
+        console.error('Error sending email:', emailError);
+        toast.warning("Бронирование создано, но не удалось отправить уведомление на email");
+      } else {
+        toast.success("Бронирование успешно создано! Подтверждение отправлено на email.");
+      }
       
       // Reset form
       setCheckIn(undefined);
@@ -190,8 +188,10 @@ const BookingForm = () => {
       setPhone("");
       setEmail("");
     } catch (error) {
-      console.error('Error updating payment:', error);
-      toast.error("Ошибка при обработке оплаты");
+      console.error('Error creating booking:', error);
+      toast.error("Ошибка при создании бронирования");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -366,47 +366,15 @@ const BookingForm = () => {
 
               <Button 
                 type="submit" 
+                disabled={isSubmitting}
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg transition-all duration-300 hover:scale-105 animate-fade-in-up"
                 style={{ animationDelay: '0.5s' }}
               >
-                Забронировать и оплатить
+                {isSubmitting ? "Отправка..." : "Забронировать"}
               </Button>
             </form>
           </CardContent>
         </Card>
-
-        <Dialog open={showPayment} onOpenChange={setShowPayment}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Оплата бронирования</DialogTitle>
-              <DialogDescription>
-                Подтвердите оплату для завершения бронирования
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Имя: {name}</p>
-                <p className="text-sm text-muted-foreground">Email: {email}</p>
-                <p className="text-sm text-muted-foreground">Телефон: {phone}</p>
-                <p className="text-sm text-muted-foreground">
-                  Даты: {checkIn && format(checkIn, "dd.MM.yyyy")} - {checkOut && format(checkOut, "dd.MM.yyyy")}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Тип номера: {rooms.find(r => r.id === roomType)?.title}
-                </p>
-              </div>
-              <div className="border-t pt-4">
-                <p className="text-2xl font-bold text-foreground">Итого: {totalPrice} BYN</p>
-              </div>
-              <Button 
-                onClick={handlePayment}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg"
-              >
-                Оплатить (Фиктивная оплата)
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
     </section>
   );

@@ -9,11 +9,11 @@ const About = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
-            {settings.about_title || "О нашем отеле"}
+            {settings.about_title || "About Our Hotel"}
           </h2>
           <div className="w-24 h-1 bg-primary mx-auto mb-6" />
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {settings.about_description || "Вилла Роза - это мини-отель, где классический стиль сочетается с современным комфортом. Мы создали пространство для вашего идеального отдыха в центре Гомеля."}
+            {settings.about_description || "Villa Rosa is a boutique hotel where classic Italian style meets modern comfort. We've created a space for your perfect stay in the heart of Rome."}
           </p>
         </div>
 
@@ -22,9 +22,9 @@ const About = () => {
             <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:animate-bounce-subtle">
               <Hotel className="w-8 h-8 text-primary group-hover:scale-110 transition-transform duration-300" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-card-foreground">Комфортные номера</h3>
+            <h3 className="text-xl font-semibold mb-2 text-card-foreground">Comfortable Rooms</h3>
             <p className="text-muted-foreground">
-              Уютные номера с классическим дизайном и всеми удобствами
+              Cozy rooms with classic design and all amenities
             </p>
           </div>
 
@@ -32,9 +32,9 @@ const About = () => {
             <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:animate-bounce-subtle">
               <MapPin className="w-8 h-8 text-primary group-hover:scale-110 transition-transform duration-300" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-card-foreground">Удобное расположение</h3>
+            <h3 className="text-xl font-semibold mb-2 text-card-foreground">Prime Location</h3>
             <p className="text-muted-foreground">
-              {settings.contact_address || "ул. Ильича, 150, Гомель"} - в доступной близости от центра
+              {settings.contact_address || "Via del Corso, 150, Rome"} - steps from the city center
             </p>
           </div>
 
@@ -42,9 +42,9 @@ const About = () => {
             <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:animate-bounce-subtle">
               <Clock className="w-8 h-8 text-primary group-hover:scale-110 transition-transform duration-300" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-card-foreground">Работаем круглосуточно</h3>
+            <h3 className="text-xl font-semibold mb-2 text-card-foreground">24/7 Service</h3>
             <p className="text-muted-foreground">
-              Наша стойка регистрации работает 24/7 для вашего удобства
+              Our reception is open around the clock for your convenience
             </p>
           </div>
 
@@ -52,9 +52,9 @@ const About = () => {
             <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:animate-bounce-subtle">
               <Phone className="w-8 h-8 text-primary group-hover:scale-110 transition-transform duration-300" />
             </div>
-            <h3 className="text-xl font-semibold mb-2 text-card-foreground">Всегда на связи</h3>
+            <h3 className="text-xl font-semibold mb-2 text-card-foreground">Always Available</h3>
             <p className="text-muted-foreground">
-              Звоните нам: {settings.contact_phone || "+375 33 355-97-67"}
+              Call us: {settings.contact_phone || "+39 06 1234 5678"}
             </p>
           </div>
         </div>

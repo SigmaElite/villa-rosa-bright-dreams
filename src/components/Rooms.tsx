@@ -38,7 +38,7 @@ const Rooms = () => {
       if (error) throw error;
       setRooms(data || []);
     } catch (error) {
-      toast.error("Ошибка загрузки номеров");
+      toast.error("Error loading rooms");
     } finally {
       setLoading(false);
     }
@@ -50,10 +50,10 @@ const Rooms = () => {
 
   const amenityIcons: { [key: string]: any } = {
     "Wi-Fi": Wifi,
-    "ТВ": Tv,
-    "Кофемашина": Coffee,
-    "Кондиционер": Wind,
-    "Мини-бар": Coffee
+    "TV": Tv,
+    "Coffee Machine": Coffee,
+    "Air Conditioning": Wind,
+    "Mini-bar": Coffee
   };
 
   return (
@@ -61,21 +61,21 @@ const Rooms = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
-            Наши номера
+            Our Rooms
           </h2>
           <div className="w-24 h-1 bg-primary mx-auto mb-6" />
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Выберите идеальный номер для вашего комфортного проживания
+            Choose the perfect room for your comfortable stay
           </p>
         </div>
 
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Загрузка номеров...</p>
+            <p className="text-muted-foreground">Loading rooms...</p>
           </div>
         ) : rooms.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Номера пока не добавлены</p>
+            <p className="text-muted-foreground">No rooms available yet</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-8">
@@ -137,7 +137,7 @@ const Rooms = () => {
                     )}
                   </Carousel>
                   <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold pointer-events-none z-30">
-                    от {room.price} BYN/сутки
+                    from €{room.price}/night
                   </div>
                   {room.images.length > 1 && (
                     <div className="absolute bottom-4 left-4 bg-background/90 text-foreground px-3 py-1 rounded-full text-sm flex items-center gap-1 pointer-events-none z-30">
@@ -169,7 +169,7 @@ const Rooms = () => {
                     }}
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 hover:scale-105"
                   >
-                    Забронировать
+                    Book Now
                   </Button>
                 </CardContent>
               </Card>
@@ -195,11 +195,11 @@ const Rooms = () => {
                   ))}
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Описание</h3>
+                  <h3 className="text-xl font-semibold mb-2">Description</h3>
                   <p className="text-muted-foreground">{selectedRoom.description}</p>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-3">Удобства</h3>
+                  <h3 className="text-xl font-semibold mb-3">Amenities</h3>
                   <div className="grid grid-cols-2 gap-3">
                     {selectedRoom.amenities.map((amenity, i) => {
                       const Icon = amenityIcons[amenity];
@@ -214,8 +214,8 @@ const Rooms = () => {
                 </div>
                 <div className="flex items-center justify-between pt-4 border-t">
                   <div>
-                    <p className="text-sm text-muted-foreground">Цена за ночь</p>
-                    <p className="text-3xl font-bold text-primary">{selectedRoom.price} BYN</p>
+                    <p className="text-sm text-muted-foreground">Price per night</p>
+                    <p className="text-3xl font-bold text-primary">€{selectedRoom.price}</p>
                   </div>
                   <Button 
                     size="lg"
@@ -225,7 +225,7 @@ const Rooms = () => {
                     }}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
-                    Забронировать
+                    Book Now
                   </Button>
                 </div>
               </div>

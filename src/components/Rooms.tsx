@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Wifi, Tv, Coffee, Wind, ImageIcon } from "lucide-react";
+import { Wifi, Tv, Coffee, Wind, ImageIcon, Bath, Refrigerator, Home, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -53,7 +53,12 @@ const Rooms = () => {
     "TV": Tv,
     "Coffee Machine": Coffee,
     "Air Conditioning": Wind,
-    "Mini-bar": Coffee
+    "Mini-bar": Coffee,
+    "Private Bathroom": Bath,
+    "Refrigerator": Refrigerator,
+    "Balcony": Home,
+    "Living Area": Home,
+    "Premium Toiletries": Sparkles
   };
 
   return (

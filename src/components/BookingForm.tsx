@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { CalendarIcon } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
-import { ru } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,21 +20,21 @@ import { useNavigate } from "react-router-dom";
 const bookingSchema = z.object({
   name: z.string()
     .trim()
-    .min(2, "Имя должно содержать минимум 2 символа")
-    .max(100, "Имя слишком длинное")
-    .regex(/^[а-яА-ЯёЁa-zA-Z\s-]+$/, "Имя содержит недопустимые символы"),
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name is too long")
+    .regex(/^[a-zA-Z\s-]+$/, "Name contains invalid characters"),
   
   phone: z.string()
     .trim()
-    .regex(/^\+375\s?\(?\d{2}\)?\s?\d{3}-?\d{2}-?\d{2}$/, "Формат: +375 (XX) XXX-XX-XX")
-    .max(20, "Телефон слишком длинный"),
+    .regex(/^\+39\s?\d{2,3}\s?\d{3,4}\s?\d{3,4}$/, "Format: +39 XX XXX XXXX")
+    .max(20, "Phone number is too long"),
   
   email: z.string()
     .trim()
-    .email("Неверный формат email")
-    .max(255, "Email слишком длинный"),
+    .email("Invalid email format")
+    .max(255, "Email is too long"),
   
-  roomType: z.string().min(1, "Выберите тип номера"),
+  roomType: z.string().min(1, "Please select a room type"),
 });
 
 type Room = {
@@ -69,7 +69,7 @@ const BookingForm = () => {
         setRooms(data || []);
       } catch (error) {
         console.error('Error fetching rooms:', error);
-        toast.error("Ошибка загрузки номеров");
+        toast.error("Error loading rooms");
       } finally {
         setLoading(false);
       }
@@ -85,14 +85,14 @@ const BookingForm = () => {
     // Check if user is authenticated
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      toast.error("Необходимо войти в систему для бронирования");
+      toast.error("Please sign in to make a booking");
       navigate("/auth");
       return;
     }
 
     // Validate dates
     if (!checkIn || !checkOut) {
-      toast.error("Пожалуйста, выберите даты заезда и выезда");
+      toast.error("Please select check-in and check-out dates");
       return;
     }
 
@@ -100,12 +100,12 @@ const BookingForm = () => {
     today.setHours(0, 0, 0, 0);
     
     if (checkIn < today) {
-      toast.error("Дата заезда не может быть в прошлом");
+      toast.error("Check-in date cannot be in the past");
       return;
     }
 
     if (checkOut <= checkIn) {
-      toast.error("Дата выезда должна быть позже даты заезда");
+      toast.error("Check-out date must be after check-in date");
       return;
     }
 
@@ -125,7 +125,7 @@ const BookingForm = () => {
         }
       });
       setErrors(fieldErrors);
-      toast.error("Пожалуйста, проверьте введенные данные");
+      toast.error("Please check your input data");
       return;
     }
 
@@ -133,7 +133,7 @@ const BookingForm = () => {
     const nights = differenceInDays(checkOut, checkIn);
     const selectedRoom = rooms.find(r => r.id === roomType);
     if (!selectedRoom) {
-      toast.error("Выбранный номер не найден");
+      toast.error("Selected room not found");
       return;
     }
     const total = nights * selectedRoom.price;
@@ -175,9 +175,9 @@ const BookingForm = () => {
 
       if (emailError) {
         console.error('Error sending email:', emailError);
-        toast.warning("Бронирование создано, но не удалось отправить уведомление на email");
+        toast.warning("Booking created, but failed to send email notification");
       } else {
-        toast.success("Бронирование успешно создано! Подтверждение отправлено на email.");
+        toast.success("Booking successfully created! Confirmation sent to your email.");
       }
       
       // Reset form
@@ -189,7 +189,7 @@ const BookingForm = () => {
       setEmail("");
     } catch (error) {
       console.error('Error creating booking:', error);
-      toast.error("Ошибка при создании бронирования");
+      toast.error("Error creating booking");
     } finally {
       setIsSubmitting(false);
     }
@@ -200,24 +200,24 @@ const BookingForm = () => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
-            Бронирование
+            Booking
           </h2>
           <div className="w-24 h-1 bg-primary mx-auto mb-6" />
           <p className="text-lg text-muted-foreground">
-            Заполните форму, и мы свяжемся с вами для подтверждения
+            Fill out the form and we'll contact you to confirm
           </p>
         </div>
 
         <Card className="animate-scale-in border-border">
           <CardHeader>
-            <CardTitle className="text-2xl font-serif text-card-foreground">Форма бронирования</CardTitle>
-            <CardDescription>Введите данные для резервирования номера</CardDescription>
+            <CardTitle className="text-2xl font-serif text-card-foreground">Booking Form</CardTitle>
+            <CardDescription>Enter your details to reserve a room</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                 <div className="space-y-2">
-                  <Label htmlFor="name">Ваше имя *</Label>
+                  <Label htmlFor="name">Your Name *</Label>
                   <Input
                     id="name"
                     value={name}
@@ -229,7 +229,7 @@ const BookingForm = () => {
                         setErrors(newErrors);
                       }
                     }}
-                    placeholder="Иван Иванов"
+                    placeholder="John Smith"
                     required
                     className={errors.name ? "border-destructive" : ""}
                   />
@@ -237,7 +237,7 @@ const BookingForm = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Телефон *</Label>
+                  <Label htmlFor="phone">Phone *</Label>
                   <Input
                     id="phone"
                     type="tel"
@@ -250,7 +250,7 @@ const BookingForm = () => {
                         setErrors(newErrors);
                       }
                     }}
-                    placeholder="+375 (29) 123-45-67"
+                    placeholder="+39 06 1234 5678"
                     required
                     className={errors.phone ? "border-destructive" : ""}
                   />
@@ -280,7 +280,7 @@ const BookingForm = () => {
               </div>
 
               <div className="space-y-2 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-                <Label>Тип номера *</Label>
+                <Label>Room Type *</Label>
                 <Select 
                   value={roomType} 
                   onValueChange={(value) => {
@@ -295,12 +295,12 @@ const BookingForm = () => {
                   disabled={loading}
                 >
                   <SelectTrigger className={errors.roomType ? "border-destructive" : ""}>
-                    <SelectValue placeholder={loading ? "Загрузка..." : "Выберите тип номера"} />
+                    <SelectValue placeholder={loading ? "Loading..." : "Select room type"} />
                   </SelectTrigger>
                   <SelectContent>
                     {rooms.map((room) => (
                       <SelectItem key={room.id} value={room.id}>
-                        {room.title} ({room.price} BYN/сутки)
+                        {room.title} (€{room.price}/night)
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -310,7 +310,7 @@ const BookingForm = () => {
 
               <div className="grid md:grid-cols-2 gap-6 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
                 <div className="space-y-2">
-                  <Label>Дата заезда *</Label>
+                  <Label>Check-in Date *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -321,7 +321,7 @@ const BookingForm = () => {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {checkIn ? format(checkIn, "PPP", { locale: ru }) : "Выберите дату"}
+                        {checkIn ? format(checkIn, "PPP", { locale: enUS }) : "Select date"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -337,7 +337,7 @@ const BookingForm = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Дата выезда *</Label>
+                  <Label>Check-out Date *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -348,7 +348,7 @@ const BookingForm = () => {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {checkOut ? format(checkOut, "PPP", { locale: ru }) : "Выберите дату"}
+                        {checkOut ? format(checkOut, "PPP", { locale: enUS }) : "Select date"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0">
@@ -370,7 +370,7 @@ const BookingForm = () => {
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-lg transition-all duration-300 hover:scale-105 animate-fade-in-up"
                 style={{ animationDelay: '0.5s' }}
               >
-                {isSubmitting ? "Отправка..." : "Забронировать"}
+                {isSubmitting ? "Submitting..." : "Book Now"}
               </Button>
             </form>
           </CardContent>

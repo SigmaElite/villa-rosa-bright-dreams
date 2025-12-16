@@ -9,11 +9,11 @@ const Contact = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
-            Контакты
+            Contact Us
           </h2>
           <div className="w-24 h-1 bg-primary mx-auto mb-6" />
           <p className="text-lg text-muted-foreground">
-            Мы всегда рады ответить на ваши вопросы
+            We're always happy to answer your questions
           </p>
         </div>
 
@@ -24,8 +24,8 @@ const Contact = () => {
                 <MapPin className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
               </div>
               <div>
-                <h3 className="font-semibold text-lg mb-2 text-foreground">Адрес</h3>
-                <p className="text-muted-foreground">{settings.contact_address || "ул. Ильича, 150, Гомель, Беларусь"}</p>
+                <h3 className="font-semibold text-lg mb-2 text-foreground">Address</h3>
+                <p className="text-muted-foreground">{settings.contact_address || "Via del Corso, 150, 00186 Rome, Italy"}</p>
               </div>
             </div>
 
@@ -34,12 +34,12 @@ const Contact = () => {
                 <Phone className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
               </div>
               <div>
-                <h3 className="font-semibold text-lg mb-2 text-foreground">Телефон</h3>
+                <h3 className="font-semibold text-lg mb-2 text-foreground">Phone</h3>
                 <a 
-                  href={`tel:${settings.contact_phone?.replace(/\s/g, '') || '+375333559767'}`}
+                  href={`tel:${settings.contact_phone?.replace(/\s/g, '') || '+390612345678'}`}
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  {settings.contact_phone || "+375 33 355-97-67"}
+                  {settings.contact_phone || "+39 06 1234 5678"}
                 </a>
               </div>
             </div>
@@ -49,8 +49,8 @@ const Contact = () => {
                 <Clock className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
               </div>
               <div>
-                <h3 className="font-semibold text-lg mb-2 text-foreground">Время работы</h3>
-                <p className="text-muted-foreground">Круглосуточно<br />7 дней в неделю</p>
+                <h3 className="font-semibold text-lg mb-2 text-foreground">Working Hours</h3>
+                <p className="text-muted-foreground">24/7<br />7 days a week</p>
               </div>
             </div>
 
@@ -61,10 +61,10 @@ const Contact = () => {
               <div>
                 <h3 className="font-semibold text-lg mb-2 text-foreground">Email</h3>
                 <a 
-                  href={`mailto:${settings.contact_email || 'info@villaroza.by'}`}
+                  href={`mailto:${settings.contact_email || 'info@villarosa.it'}`}
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
-                  {settings.contact_email || "info@villaroza.by"}
+                  {settings.contact_email || "info@villarosa.it"}
                 </a>
               </div>
             </div>
@@ -73,14 +73,14 @@ const Contact = () => {
           <div className="animate-slide-in-right">
             <div className="w-full h-96 bg-muted rounded-lg overflow-hidden">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2396.7774647487744!2d30.967686!3d52.424721!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTLCsDI1JzI5LjAiTiAzMMKwNTgnMDMuNyJF!5e0!3m2!1sen!2sby!4v1234567890"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2969.6557489647!2d12.4804!3d41.9028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x132f61a49eaac8a1%3A0x9f9b60c45d7b5d8a!2sVia%20del%20Corso%2C%20Roma%20RM%2C%20Italy!5e0!3m2!1sen!2s!4v1234567890"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Вилла Роза на карте"
+                title="Villa Rosa on map"
               />
             </div>
           </div>

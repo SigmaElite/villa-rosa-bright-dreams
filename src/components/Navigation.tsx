@@ -17,10 +17,10 @@ const Navigation = () => {
   }, []);
 
   const navLinks = [
-    { href: "#about", label: "О нас" },
-    { href: "#rooms", label: "Номера" },
-    { href: "#booking", label: "Бронирование" },
-    { href: "#contact", label: "Контакты" },
+    { href: "#about", label: "About" },
+    { href: "#rooms", label: "Rooms" },
+    { href: "#booking", label: "Booking" },
+    { href: "#contact", label: "Contact" },
   ];
 
   const scrollToSection = (href: string) => {
@@ -45,7 +45,7 @@ const Navigation = () => {
               isScrolled ? "text-foreground" : "text-white"
             }`}
           >
-            Вилла Роза
+            Villa Rosa
           </button>
 
           {/* Desktop Navigation */}
@@ -65,7 +65,7 @@ const Navigation = () => {
               onClick={() => scrollToSection("#booking")}
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
-              Забронировать
+              Book Now
             </Button>
             <Link to="/auth">
               <Button
@@ -106,7 +106,7 @@ const Navigation = () => {
                 onClick={() => scrollToSection("#booking")}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground w-full"
               >
-                Забронировать
+                Book Now
               </Button>
               <Link to="/auth" className="w-full">
                 <Button
@@ -114,7 +114,7 @@ const Navigation = () => {
                   className={`w-full ${isScrolled ? "" : "border-white text-white hover:bg-white/20"}`}
                 >
                   <Lock className="h-4 w-4 mr-2" />
-                  Вход для администратора
+                  Admin Login
                 </Button>
               </Link>
             </div>

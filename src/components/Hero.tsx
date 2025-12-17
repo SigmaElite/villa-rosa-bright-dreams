@@ -24,7 +24,7 @@ const Hero = () => {
         <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 tracking-tight">
           {settings.hero_title || "Villa Rosa"}
         </h1>
-        <p className="text-xl md:text-2xl text-white/90 mb-8 font-light">
+        <p className="text-xl md:text-2xl text-white mb-8 font-normal drop-shadow-lg">
           {settings.hero_description || "Classic comfort in the heart of Rome"}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -69,9 +69,9 @@ const Navigation = () => {
             </Button>
             <Link to="/auth">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="icon"
-                className={isScrolled ? "" : "border-white text-white hover:bg-white/20"}
+                className="opacity-0 hover:opacity-30 transition-opacity"
               >
                 <Lock className="h-4 w-4" />
               </Button>
@@ -110,11 +110,11 @@ const Navigation = () => {
               </Button>
               <Link to="/auth" className="w-full">
                 <Button
-                  variant="outline"
-                  className={`w-full ${isScrolled ? "" : "border-white text-white hover:bg-white/20"}`}
+                  variant="ghost"
+                  className="w-full opacity-0 hover:opacity-30 transition-opacity"
                 >
                   <Lock className="h-4 w-4 mr-2" />
-                  Admin Login
+                  Admin
                 </Button>
               </Link>
             </div>
